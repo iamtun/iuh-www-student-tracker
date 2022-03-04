@@ -38,8 +38,9 @@ public class StudentDBUtil {
 				String firstName = rs.getString("first_name");
 				String lastName = rs.getString("last_name");
 				String email = rs.getString("email");
+				String image = rs.getString("image");
 				
-				Student tempStudent = new Student(id, firstName, lastName, email);
+				Student tempStudent = new Student(id, firstName, lastName, email, image);
 				students.add(tempStudent);
 			}
 			
@@ -66,7 +67,7 @@ public class StudentDBUtil {
 	}
 	
 	public boolean addStudent(Student st) throws SQLException {
-		String sql = "insert into info_student values(?, ?, ?)";
+		String sql = "insert into info_student values(?, ?, ?, ?)";
 		try(
 				Connection conn = dataSource.getConnection();
 				PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -74,7 +75,7 @@ public class StudentDBUtil {
 			pstmt.setString(1, st.getFirstName());
 			pstmt.setString(2, st.getLastName());
 			pstmt.setString(3, st.getEmail());
-			
+			pstmt.setString(4, st.getImage());
 			return pstmt.executeUpdate() > 0;
 		}
 	}
@@ -95,7 +96,8 @@ public class StudentDBUtil {
 					String firstName = rs.getString("first_name");
 					String lastName = rs.getString("last_name");
 					String email = rs.getString("email");
-					Student st = new Student(id, firstName, lastName, email);
+					String image = rs.getString("image");
+					Student st = new Student(id, firstName, lastName, email, image);
 					
 					return st;
 				}
@@ -106,7 +108,7 @@ public class StudentDBUtil {
 	}
 	
 	public void updateStudent(Student st) throws SQLException {
-		String sql = "update info_student set first_name = ?, last_name = ?, email = ? where id=?";
+		String sql = "update info_student set first_name = ?, last_name = ?, email = ?, image= ? where id=?";
 		try(
 				Connection conn = dataSource.getConnection();
 				PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -114,7 +116,8 @@ public class StudentDBUtil {
 			pstmt.setString(1, st.getFirstName());
 			pstmt.setString(2, st.getLastName());
 			pstmt.setString(3, st.getEmail());
-			pstmt.setInt(4, st.getId());
+			pstmt.setString(4, st.getImage());
+			pstmt.setInt(5, st.getId());
 			
 			pstmt.execute();
 		}

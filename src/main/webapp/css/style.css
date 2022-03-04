@@ -17,3 +17,7 @@ header .title-table {
 	border-radius: 5px;
 	
 }
+
+input {
+	padding: 0 8px;
+}

@@ -1,25 +1,31 @@
 package iuh.fit.web.jdbc;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.List;
 
 import javax.annotation.Resource;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
 import javax.sql.DataSource;
 
-
+@MultipartConfig
 @WebServlet("/StudentController")
 public class StudentController extends HttpServlet{
 
 	private static final long serialVersionUID = 1L;
 	
 	private StudentDBUtil studentDbUtil;
+	
+//	private final String PATH = "http://localhost:8080/student-tracker";
 	
 	@Resource(name = "jdbc/web_student_tracker")
 	private DataSource dataSource;
@@ -57,7 +63,11 @@ public class StudentController extends HttpServlet{
 			throw new ServletException(e);
 		}
 	}
-
+	
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		doGet(req, resp);
+	}
 	private void deleteStudent(HttpServletRequest req, HttpServletResponse resp) throws Exception {
 		String id = req.getParameter("studentId");
 		
@@ -68,15 +78,35 @@ public class StudentController extends HttpServlet{
 	}
 
 	private void updateStudent(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-		int id = Integer.parseInt(req.getParameter("id"));
-		String firstName = req.getParameter("firstName");
-		String lastName = req.getParameter("lastName");
-		String email = req.getParameter("email");
 		
-		Student theStudent = new Student(id, firstName, lastName, email);
-		
-		studentDbUtil.updateStudent(theStudent);
-		listStudents(req, resp);
+		try {
+			int id = Integer.parseInt(req.getParameter("id"));
+			String firstName = req.getParameter("firstName");
+			String lastName = req.getParameter("lastName");
+			String email = req.getParameter("email");
+			
+			Part image = req.getPart("image");
+			
+			//Lấy đường dẫn của folder uploads 
+			String realPath = req.getServletContext().getRealPath("/uploads"); 
+			
+			//Lấy tên file
+			String fileName = Path.of(image.getSubmittedFileName()).getFileName().toString();
+			
+			//Đường dẫn của ảnh
+			String imgPath = realPath + "\\" + fileName;
+			
+			//Ghi ảnh vào theo đường dẫn
+			if(!Files.exists(Path.of(imgPath)))
+				image.write(imgPath);
+			
+			Student theStudent = new Student(id, firstName, lastName, email, fileName);
+			studentDbUtil.updateStudent(theStudent);
+			
+			listStudents(req, resp);
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void loadStudent(HttpServletRequest req, HttpServletResponse resp) throws SQLException, ServletException, IOException {
@@ -93,14 +123,42 @@ public class StudentController extends HttpServlet{
 	}
 
 	private void addStudent(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-		String firstName = req.getParameter("firstName");
-		String lastName = req.getParameter("lastName");
-		String email = req.getParameter("email");
-		
-		Student theStudent = new Student(firstName, lastName, email);
-		studentDbUtil.addStudent(theStudent);
-		
-		listStudents(req, resp);
+		try {
+			String firstName = req.getParameter("firstName");
+			String lastName = req.getParameter("lastName");
+			String email = req.getParameter("email");
+			
+			Part image = req.getPart("image");
+			
+			//Lấy đường dẫn của folder uploads 
+			String realPath = req.getServletContext().getRealPath("/uploads"); 
+			
+			//Lấy tên file
+			String fileName = Path.of(image.getSubmittedFileName()).getFileName().toString();
+			
+			//Đường dẫn của ảnh
+			String imgPath = realPath + "\\" + fileName;
+			
+//			System.out.println("link path: " + imgPath);
+//			System.out.println(realPath);
+			
+			//Nếu folder upload không tồn tại thì sẽ tạo folder
+			if(!Files.exists(Path.of(realPath))) {
+				Files.createDirectory(Path.of(realPath));
+			}
+			
+			//Ghi ảnh vào theo đường dẫn
+			if(!Files.exists(Path.of(imgPath)))
+				image.write(imgPath);
+			
+			Student theStudent = new Student(firstName, lastName, email, fileName);
+			
+			studentDbUtil.addStudent(theStudent);
+			
+			listStudents(req, resp);
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void listStudents(HttpServletRequest req, HttpServletResponse resp) throws Exception {

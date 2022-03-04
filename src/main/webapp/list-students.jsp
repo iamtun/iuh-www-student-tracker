@@ -29,6 +29,7 @@
 				      <th scope="col">First Name</th>
 				      <th scope="col">Last Name</th>
 				      <th scope="col">Email</th>
+				      <th scope="col">Image</th>
 				      <th scope="col">Action</th>
 				    </tr>
 				  </thead>
@@ -49,6 +50,7 @@
 				  		<td>${tempStudent.firstName}</td>
 				  		<td>${tempStudent.lastName}</td>
 				  		<td>${tempStudent.email}</td>
+				  		<td><img src="uploads/${tempStudent.image}" alt="picture" width="120" height="150"></td>
 				  		<td>
 				  			<a href="${tempLink}">UPDATE</a> |
 				  			<a href="${deleteLink}"

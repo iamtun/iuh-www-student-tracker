@@ -25,7 +25,8 @@
 			<c:url var="backLink" value="StudentController">
 				<c:param name="command" value="LIST"></c:param>
 			</c:url>
-			<form action="StudentController" method="get">
+			
+			<form action="StudentController" method="post" enctype="multipart/form-data">
 				<input type="hidden" name="command" value="UPDATE" />
 				<input type="hidden" name="id" value="${THE_STUDENT.id}"/>
 				<table>
@@ -44,6 +45,10 @@
 						<td><input type="text" name="email" value="${THE_STUDENT.email}"/></td>
 					</tr>
 					
+					<tr>
+						<td><label>Image:</label></td>
+						<td><input type="file" name="image" value="${THE_STUDENT.image }"/></td>
+					</tr>
 					<tr>
 						<td></td>
 						<td><input type="submit" value="Update" class="button-submit"/></td>
